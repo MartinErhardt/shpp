@@ -39,6 +39,11 @@ int main(int argc, char **argv)
 	if(f) // non-interactive
 		std::cout << "non interactive";
 	else // interactive
+	{
+		std::cout << "shpp 0.0.1 "
+			  	"Copyright (C) 2015 Martin Erhardt<martin.erhardt98@googlemail.com>\n"
+				"This is free software with ABSOLUTELY NO WARRANTY.\n"
+				"This is free software, and you are welcome to redistribute it under certain conditions\n";
 		while(to_interprete.compare(0,1,"q"))
 		{
 			if(to_interprete.length())
@@ -49,5 +54,6 @@ int main(int argc, char **argv)
 			while((i=getchar()) != '\n')
 				to_interprete+=i;
 		}
+	}
 	return 0;
 }
