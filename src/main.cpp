@@ -20,25 +20,36 @@
 #include<string.h>
 #include<stdio.h>
 #include<unistd.h>
+#include<errno.h>
 int main(int argc, char **argv)
 {
 	int i=0;
 	FILE*f=NULL;
+	bool no_input=true;
 	std::string to_interprete;
 	for(;i<argc;i++)
 		if(!strcmp(argv[i],"-c") && (i+1)<argc)
 		{
-			std::cout << "interpreting ";
-			std::cout << argv[i+1];
-			std::cout << "\n";
 			f=fopen(argv[i+1],"rb");
+			fseek(f, 0, SEEK_END);
+			long fsize = ftell(f);
+			fseek(f, 0, SEEK_SET);
+			char *string = new char[fsize + 1];
+			fread(string, fsize, 1, f);
+			fclose(f);
+			to_interprete=string;
+			delete [] string;
+			no_input=false;
 			break;
 		}
-	if(!f && !isatty(0)) // is there some pipe input ?
+	if(no_input && !isatty(0)) // is there some pipe input ?
+	{
 		f=fdopen(0,"rb");
-	if(f) // non-interactive
-		std::cout << "non interactive";
-	else // interactive
+		while((i=getchar()))
+			to_interprete+=i;
+		no_input=false;
+	}
+	if(no_input) // interactive
 	{
 		std::cout << "shpp 0.0.1 "
 			  	"Copyright (C) 2015 Martin Erhardt<martin.erhardt98@googlemail.com>\n"
@@ -51,9 +62,10 @@ int main(int argc, char **argv)
 			std::cout << to_interprete;
 			to_interprete.clear();
 			std::cout << "$ "; // this will be $PS1 in later versions
-			while((i=getchar()) != '\n')
+			while((i=getchar()) != '\n' && i)
 				to_interprete+=i;
 		}
 	}
+	std::cout << to_interprete;
 	return 0;
 }
