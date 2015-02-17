@@ -3,7 +3,7 @@ OBJS = $(addsuffix .o,$(basename $(SRCS)))
 
 CXX = g++
 
-CXXFLAGS = -Wall -Werror -pedantic -O2
+CXXFLAGS = -std=c++11 -Wall -Werror -O2 -I src/inc
 
 shpp: $(OBJS)
 	$(CXX) -o $@ $^

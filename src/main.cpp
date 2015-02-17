@@ -20,52 +20,40 @@
 #include<string.h>
 #include<stdio.h>
 #include<unistd.h>
-#include<errno.h>
+#include<shpp.h>
+#include<lexer.h>
+using namespace shpp;
 int main(int argc, char **argv)
 {
 	int i=0;
-	FILE*f=NULL;
-	bool no_input=true;
 	std::string to_interprete;
 	for(;i<argc;i++)
 		if(!strcmp(argv[i],"-c") && (i+1)<argc)
-		{
-			f=fopen(argv[i+1],"rb");
-			fseek(f, 0, SEEK_END);
-			long fsize = ftell(f);
-			fseek(f, 0, SEEK_SET);
-			char *string = new char[fsize + 1];
-			fread(string, fsize, 1, f);
-			fclose(f);
-			to_interprete=string;
-			delete [] string;
-			no_input=false;
-			break;
-		}
-	if(no_input && !isatty(0)) // is there some pipe input ?
-	{
-		f=fdopen(0,"rb");
-		while((i=getchar()))
+			return interprete(new std::string(argv[i+1]));
+	if(!isatty(0)) // is there some pipe input ?
+	{ 
+		while((i=getchar())>0)
 			to_interprete+=i;
-		no_input=false;
+		return interprete(&to_interprete);
 	}
-	if(no_input) // interactive
+	std::cout << "shpp 0.0.1 "
+		  	"Copyright (C) 2015 Martin Erhardt<martin.erhardt98@googlemail.com>\n"
+			"This is free software with ABSOLUTELY NO WARRANTY.\n"
+			"This is free software, and you are welcome to redistribute it under certain conditions\n";
+	while(to_interprete.compare(0,1,"q"))
 	{
-		std::cout << "shpp 0.0.1 "
-			  	"Copyright (C) 2015 Martin Erhardt<martin.erhardt98@googlemail.com>\n"
-				"This is free software with ABSOLUTELY NO WARRANTY.\n"
-				"This is free software, and you are welcome to redistribute it under certain conditions\n";
-		while(to_interprete.compare(0,1,"q"))
-		{
-			if(to_interprete.length())
-				to_interprete.append("\n");
-			std::cout << to_interprete;
-			to_interprete.clear();
-			std::cout << "$ "; // this will be $PS1 in later versions
-			while((i=getchar()) != '\n' && i)
-				to_interprete+=i;
-		}
+		if(to_interprete.length())
+			to_interprete.append("\n");
+		interprete(&to_interprete);
+		to_interprete.clear();
+		std::cout << "\n$ "; // this will be $PS1 in later versions
+		while((i=getchar()) != '\n' && i)
+			to_interprete+=i;
 	}
-	std::cout << to_interprete;
+	return 0;
+}
+int shpp::interprete(std::string * to_interprete)
+{
+	shpp::Lexer::tokenize(to_interprete);
 	return 0;
 }
