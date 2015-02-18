@@ -33,8 +33,7 @@ enum state
 	NORMAL,
 	DOUBLE_QUOTED,
 	SINGLE_QUOTED,
-	BACKSLASH_ESCAPED,
-	NONE_
+	BACKSLASH_ESCAPED
 };
 const int states[4][3*2] =
 {
@@ -54,9 +53,9 @@ const int states[4][3*2] =
 		'\\', NORMAL
 	}, // BACKSLASH_ESCAPED
 	{
-		'"', NORMAL,
-		'\'', NORMAL,
-		'\\', NORMAL
+		'"', POP,
+		'\'', POP,
+		'\\', POP
 	}
 };
 enum operand_state
@@ -104,14 +103,15 @@ std::vector<class Token> * shpp::Lexer::delimit(std::string * to_tokenize)
 	state_stack->push_back(NORMAL);
 	for (std::string::iterator i=to_tokenize->begin(); i<to_tokenize->end(); i++)
 	{
-		current_state=state_stack->back(),current_action=NONE_,j=0;
+		current_state=state_stack->back(),current_action=NORMAL,j=0;
 		do if(states[current_state][j*2]==*i)
 				current_action=states[current_state][j*2+1];
-		while(current_action==NONE_ && (++j)<3);
+		while(!current_action && (++j)<3);
 		std::cout << "current_action";
     		std::cout << +current_action;
-		if(current_action==POP) state_stack->pop_back();
-		else if(current_action==SINGLE_QUOTED || current_action==DOUBLE_QUOTED) state_stack->push_back((enum state)current_action);
+		if(current_state==BACKSLASH_ESCAPED)	current_action=POP;
+		if(current_action==POP)			state_stack->pop_back();
+		else if(current_action)			state_stack->push_back((enum state)current_action);
 	}
 	current_state=state_stack->back();
 	delete state_stack;
