@@ -3,8 +3,6 @@
  * @author  Martin Erhardt <martin.erhardt98@googlemail.com>
  * @version 0.0.01-prealpha
  *
- * @section LICENSE
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -18,8 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @section DESCRIPTION
- *
  * The Lexer produces a list of Tokens.
  */
 #include<string>
@@ -27,15 +23,27 @@
 #include<lexer.h>
 #include<iostream>
 using namespace shpp::Lexer;
+/**
+ * This is the only action of our pushdown automaton in shpp::Lexer::delimit(), which is not a state. 
+ * That's why it's kept seperate from enum state in a macro.
+ */
 #define POP -1
+/**
+ * These are the states of our pushdown automaton implemented in shpp::Lexer::delimit().
+ * The values are hardcoded to potencies of 2, so that they can be OR combined.
+ */
 enum state
 {
-	NORMAL,
-	DOUBLE_QUOTED,
-	SINGLE_QUOTED,
-	BACKSLASH_ESCAPED
+	NORMAL=0,
+	DOUBLE_QUOTED=1,
+	SINGLE_QUOTED=2,
+	BACKSLASH_ESCAPED=4
 };
-const int states[4][3*2] =
+/**
+ * These are the actions for our pushdown automaton implemented in
+ * @see shpp::Lexer::delimit()
+ */
+static const int actions[4][3*2] =
 {
    	{ //NORMAL
 		'"', DOUBLE_QUOTED, 
@@ -58,6 +66,13 @@ const int states[4][3*2] =
 		'\\', POP
 	}
 };
+/**
+ * current operand state
+ *
+ * http://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html#tag_02_03 :
+ * If the previous character was used as part of an operator and the current character is not quoted and can be used with the current characters to form an operator, it shall be used as part of that (operator) token.
+ * @see shpp::Lexer::delimit()
+ */
 enum operand_state
 {
 	NONE,
@@ -66,9 +81,14 @@ enum operand_state
 	DSEMI,
 	DLESS,
 	DGREAT,
-	THIRD
+	THIRD	/**< enum value THIRD(This is special we only need it for <<-) */ 
 };
-const char secondoperand_char[][5]=
+/**
+ * This contains the charactars that could possibly follow onto the first character of a character. 
+ * secondoperand_char[<enum operandstate>] contains the possible second characters of a specific first character of an operand.
+ * @see enum operand_state
+ */
+static const char secondoperand_char[][5]=
 {
 	"\0",
 	"&",
@@ -77,6 +97,14 @@ const char secondoperand_char[][5]=
 	"<&>|",
 	">"
 };
+/**
+ * builds up the list of classified tokens
+ *
+ * by calling delimit(), check_alias(), and classify()
+ * 
+ * @param	to_tokenize (std::string)
+ * @return	List of yet classified tokens(std::vector)
+ */
 std::vector<class Token> * shpp::Lexer::tokenize(std::string * to_tokenize)
 {
 	std::vector<class Token> * TokenList=delimit(to_tokenize);
@@ -85,14 +113,15 @@ std::vector<class Token> * shpp::Lexer::tokenize(std::string * to_tokenize)
 	return TokenList;
 }
 /**
- * Delimetes a list of tokens from a continuous string
+ * delimetes a list of tokens from a continuous string
  *
- * This is implemented as a pushdown automaton,so that I can keep track of the quotation marks and escape characters
+ * This is implemented as a pushdown automaton,so that I can keep track of the quotation marks and escape characters.
+ * for more information look here:
+ * http://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html#tag_02_03
+ * http://en.wikipedia.org/wiki/Pushdown_automaton
  * 
- * @param	String to tokenize (std::string)
+ * @param	to_tokenize String to tokenize (std::string)
  * @return	List of yet unclassified tokens(std::vector)
- * @see		http://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html#tag_02_03
- * @see		http://en.wikipedia.org/wiki/Pushdown_automaton
  */
 std::vector<class Token> * shpp::Lexer::delimit(std::string * to_tokenize)
 {
@@ -104,8 +133,8 @@ std::vector<class Token> * shpp::Lexer::delimit(std::string * to_tokenize)
 	for (std::string::iterator i=to_tokenize->begin(); i<to_tokenize->end(); i++)
 	{
 		current_state=state_stack->back(),current_action=NORMAL,j=0;
-		do if(states[current_state][j*2]==*i)
-				current_action=states[current_state][j*2+1];
+		do if(actions[current_state][j*2]==*i)
+				current_action=actions[current_state][j*2+1];
 		while(!current_action && (++j)<3);
 		std::cout << "current_action";
     		std::cout << +current_action;

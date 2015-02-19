@@ -1,18 +1,23 @@
-/*  ./src/main.cpp is a source file of shpp a gplv3 licensed shell written in c++
-    Copyright (C) 2015  Martin Erhardt<martin.erhardt98@googlemail.com>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
+/**
+ * @file src/main.cpp
+ * @author  Martin Erhardt <martin.erhardt98@googlemail.com>
+ * @version 0.0.01-prealpha
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Here in main.cpp, the input is read and transferred to the lexer and the parser
+ */
 #include<iostream>
 #include<string>
 #include<fstream>
@@ -23,6 +28,15 @@
 #include<shpp.h>
 #include<lexer.h>
 using namespace shpp;
+/**
+ * read input
+ *
+ * input can either be gained from the -c option, from stdin or 
+ * 
+ * @param	argc is the number of arguments
+ * @param	argv is a pointer to list of char*pointers containing all the fancy arguments
+ * @return	exit status
+ */
 int main(int argc, char **argv)
 {
 	int i=0;

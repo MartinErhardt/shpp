@@ -1,3 +1,6 @@
 shpp
 *.o
 *.sw[hmnopw]
+doc
+doxygen_conf
+doxygen_conf2
