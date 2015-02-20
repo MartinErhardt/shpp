@@ -77,11 +77,15 @@ namespace shpp
 			std::string * lexem;
 			token_t type;
 			public:
+				Token()
+				{
+					lexem=new std::string();
+				};
 				Token(std::string * start)
 				{
 					lexem=start;
 				};
-				void operator+=(std::string);
+				void add(std::string * to_add);
 		};
 		std::vector<class Token> * tokenize(std::string * to_tokenize);
 		std::vector<class Token> * delimit(std::string * to_tokenize);

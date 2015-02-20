@@ -45,26 +45,26 @@ enum state
  */
 static const int actions[4][3*2] =
 {
-   	{ //NORMAL
+   	{ 
 		'"', DOUBLE_QUOTED, 
 		'\'', SINGLE_QUOTED,
 		'\\', BACKSLASH_ESCAPED
-	}, // DOUBLE_QUOTED
+	}, /** NORMAL*/
 	{
 		'"', POP,
 		'\'', NORMAL,
 		'\\', BACKSLASH_ESCAPED
-	}, // SINGLE_QUOTED
+	}, /** DOUBLE_QUOTED*/
 	{
 		'"', NORMAL,
 		'\'', POP,
 		'\\', NORMAL
-	}, // BACKSLASH_ESCAPED
+	}, /** SINGLE_QUOTED*/
 	{
 		'"', POP,
 		'\'', POP,
 		'\\', POP
-	}
+	} /** BACKSLASH_ESCAPED*/
 };
 /**
  * current operand state
@@ -128,6 +128,8 @@ std::vector<class Token> * shpp::Lexer::delimit(std::string * to_tokenize)
 	std::vector<class Token>* TokenList = new std::vector<class Token>;
 	std::vector<enum state> * state_stack = new std::vector<enum state>;
 	int current_action,current_state,j;
+	class Token * current_token=new Token;
+	bool in_a_comment=false;
 	//enum operand_state current_operand_state=NONE;
 	state_stack->push_back(NORMAL);
 	for (std::string::iterator i=to_tokenize->begin(); i<to_tokenize->end(); i++)
@@ -136,6 +138,10 @@ std::vector<class Token> * shpp::Lexer::delimit(std::string * to_tokenize)
 		do if(actions[current_state][j*2]==*i)
 				current_action=actions[current_state][j*2+1];
 		while(!current_action && (++j)<3);
+		if(current_state=NORMAL && i->compare('#'))
+			in_a_comment=true;
+		if(in_a_comment && i->compare("\n"))
+			in_a_comment=false;
 		std::cout << "current_action";
     		std::cout << +current_action;
 		if(current_state==BACKSLASH_ESCAPED)	current_action=POP;
