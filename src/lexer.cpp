@@ -18,10 +18,11 @@
  *
  * The Lexer produces a list of Tokens.
  */
+#include<string.h>
 #include<string>
 #include<vector>
-#include<lexer.h>
 #include<iostream>
+#include<lexer.h>
 using namespace shpp::Lexer;
 /**
  * This is the only action of our pushdown automaton in shpp::Lexer::delimit(), which is not a state. 
@@ -72,7 +73,7 @@ static const char unescaped[][8]
 	" \n",
 	"",
 	""
-}
+};
 /**
  * current operand state
  *
@@ -112,9 +113,9 @@ static const char secondoperand_char[][5]=
  * @param	to_tokenize (std::string)
  * @return	List of yet classified tokens(std::vector)
  */
-std::vector<class Token> * shpp::Lexer::tokenize(std::string * to_tokenize)
+std::vector<class Token * > * shpp::Lexer::tokenize(std::string * to_tokenize)
 {
-	std::vector<class Token> * TokenList=delimit(to_tokenize);
+	std::vector<class Token * > * TokenList=delimit(to_tokenize);
 	check_alias(TokenList);
 	classify(TokenList);
 	return TokenList;
@@ -130,9 +131,9 @@ std::vector<class Token> * shpp::Lexer::tokenize(std::string * to_tokenize)
  * @param	to_tokenize String to tokenize (std::string)
  * @return	List of yet unclassified tokens(std::vector)
  */
-std::vector<class Token> * shpp::Lexer::delimit(std::string * to_tokenize)
+std::vector<class Token * > * shpp::Lexer::delimit(std::string * to_tokenize)
 {
-	std::vector<class Token>* TokenList = new std::vector<class Token>;
+	std::vector<class Token * > * TokenList = new std::vector<class Token * >;
 	std::vector<enum state> * state_stack = new std::vector<enum state>;
 	int current_action,current_state,j;
 	class Token * current_token=new Token;
@@ -149,11 +150,11 @@ std::vector<class Token> * shpp::Lexer::delimit(std::string * to_tokenize)
 			in_a_comment=true;
 		if(in_a_comment && ((*i)=='\n'))
 			in_a_comment=false;
-		if(!in_a_comment && strstr(&unescaped[current_state][0],&(*i)[0]))
+		if(!in_a_comment && strstr(&unescaped[current_state][0],&(*i)))
 		{
 			current_token = new Token(*i);
 			TokenList->push_back(current_token);
-		}else current_token->add(*i);	
+		}else current_token->add_chr(*i);
 		std::cout << "current_action";
     		std::cout << +current_action;
 		if(current_state==BACKSLASH_ESCAPED)	current_action=POP;
@@ -170,11 +171,11 @@ std::vector<class Token> * shpp::Lexer::delimit(std::string * to_tokenize)
 		return NULL;
 	}
 }
-void shpp::Lexer::check_alias(std::vector<class Token>* to_check)
+void shpp::Lexer::check_alias(std::vector<class Token *>* to_check)
 {
 	
 }
-void shpp::Lexer::classify(std::vector<class Token> * to_classify)
+void shpp::Lexer::classify(std::vector<class Token *> * to_classify)
 {
 	
 }

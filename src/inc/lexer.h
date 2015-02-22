@@ -83,14 +83,15 @@ namespace shpp
 				};
 				Token(char start)
 				{
-					lexem=start;
+					lexem=new std::string(&start);
 				};
 				void add(std::string * to_add);
+				void add_chr(char to_add);
 		};
-		std::vector<class Token> * tokenize(std::string * to_tokenize);
-		std::vector<class Token> * delimit(std::string * to_tokenize);
-		void check_alias(std::vector<class Token>* to_check);
-		void classify(std::vector<class Token> * to_classify);
+		std::vector<class Token *> * tokenize(std::string * to_tokenize);
+		std::vector<class Token *> * delimit(std::string * to_tokenize);
+		void check_alias(std::vector<class Token*>* to_check);
+		void classify(std::vector<class Token*> * to_classify);
 	}
 }
 #endif // LEXER_H

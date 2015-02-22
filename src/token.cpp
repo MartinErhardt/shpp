@@ -26,3 +26,7 @@ void shpp::Lexer::Token::add(std::string * to_add)
 {
 	*lexem=*lexem+*to_add;
 }
+void shpp::Lexer::Token::add_chr(char to_add)
+{
+	*lexem+=to_add;
+}
