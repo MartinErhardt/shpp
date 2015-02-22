@@ -81,7 +81,7 @@ namespace shpp
 				{
 					lexem=new std::string();
 				};
-				Token(std::string * start)
+				Token(char start)
 				{
 					lexem=start;
 				};

@@ -66,6 +66,13 @@ static const int actions[4][3*2] =
 		'\\', POP
 	} /** BACKSLASH_ESCAPED*/
 };
+static const char unescaped[][8]
+{
+	" \n&|;<>",
+	" \n",
+	"",
+	""
+}
 /**
  * current operand state
  *
@@ -128,7 +135,7 @@ std::vector<class Token> * shpp::Lexer::delimit(std::string * to_tokenize)
 	std::vector<class Token>* TokenList = new std::vector<class Token>;
 	std::vector<enum state> * state_stack = new std::vector<enum state>;
 	int current_action,current_state,j;
-//	class Token * current_token=new Token;
+	class Token * current_token=new Token;
 	bool in_a_comment=false;
 	//enum operand_state current_operand_state=NONE;
 	state_stack->push_back(NORMAL);
@@ -142,6 +149,11 @@ std::vector<class Token> * shpp::Lexer::delimit(std::string * to_tokenize)
 			in_a_comment=true;
 		if(in_a_comment && ((*i)=='\n'))
 			in_a_comment=false;
+		if(!in_a_comment && strstr(&unescaped[current_state][0],&(*i)[0]))
+		{
+			current_token = new Token(*i);
+			TokenList->push_back(current_token);
+		}else current_token->add(*i);	
 		std::cout << "current_action";
     		std::cout << +current_action;
 		if(current_state==BACKSLASH_ESCAPED)	current_action=POP;
